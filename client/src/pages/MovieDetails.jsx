@@ -6,6 +6,7 @@ import { ArrowRight, Heart, PlayCircle, PlayCircleIcon, StarIcon } from 'lucide-
 import timeFormat from '../lib/timeFormat'
 import DateSelect from '../components/DateSelect'
 import MovieCard from '../components/MovieCard'
+import Loading from '../components/Loading'
 
 const MovieDetails = () => {
   const {id} = useParams()
@@ -101,7 +102,7 @@ const MovieDetails = () => {
 
     </div>
   ) : (
-    <div>Loading</div>
+    <Loading/>
   )
 }
 
