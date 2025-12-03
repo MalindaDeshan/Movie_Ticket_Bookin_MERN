@@ -20,7 +20,7 @@ const Navbar = () => {
       {/*Menu Items*/}
       <div className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium
       max-md:text-lg z-50 flex flex-col md:flex-row items-center
-      max-md:justify-center gap-8 min-md:px-8 py-3 max-md:h-screen
+      max-md:justify-center gap-10 min-md:px-8 py-3 max-md:h-screen
       min-md:rounded-full backdrop-blur bg-black/70 md:bg-white/10 md:border
       border-gray-300/20 overflow-hidden transition-[width] duration-300 ${isOpen ? 'max-md:w-full' : 'max-md:w-0'}`}>
 
@@ -28,7 +28,6 @@ const Navbar = () => {
 
         <Link onClick={()=> {scrollTo(0,0);setIsOpen(false)}} to={'/'}>Home</Link>
         <Link onClick={()=> {scrollTo(0,0);setIsOpen(false)}} to={'/movies'}>Movies</Link>
-        <Link onClick={()=> {scrollTo(0,0);setIsOpen(false)}} to={'/'}>Theaters</Link>
         <Link onClick={()=> {scrollTo(0,0);setIsOpen(false)}} to={'/new-releases'}>Releases</Link>
         <Link onClick={()=> {scrollTo(0,0);setIsOpen(false)}} to={'/favorite'}>Favorites</Link>
       </div>
