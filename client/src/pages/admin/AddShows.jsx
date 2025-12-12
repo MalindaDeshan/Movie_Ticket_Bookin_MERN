@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { dummyShowsData } from '../../assets/assets';
 import Loading from '../../components/Loading';
 import Title from '../../components/admin/Title';
-import {CheckIcon, StarIcon} from 'lucide-react'
+import {CheckIcon, DeleteIcon, StarIcon} from 'lucide-react'
 import { kConverter } from '../../lib/kConverter';
 
 const AddShows = () => {
   const currency = import.meta.env.VITE_CURRENCY;
   const[nowPlayingMovies,setNowPlayingMovies]=useState([]);
   const [selectedMovie,setSelectedMovie]=useState(null);
-  const[dateTimeSelection,setDateTimeSelection]=useState(null);
+  const[dateTimeSelection,setDateTimeSelection]=useState({});
   const[dateTimeInput,setDateTimeInput]=useState("");
   const[showPrice,setShowPrice]=useState("");
 
@@ -116,10 +116,33 @@ const AddShows = () => {
       </div>
       {/*DateTime Selection Display*/}
       {Object.keys(dateTimeSelection).length > 0 && (
-        <div>
-          
+        <div className='mt-6'>
+          <h2 className='mb-2'>Selected Date-Time</h2>
+          <ul className='space-y-3'>
+            {Object.entries(dateTimeSelection).map(([date, times]) => (
+              <li key={date}>
+                <div className='font-medium'>{date}</div>
+                <div className='flex flex-wrap gap-2 mt-1 text-sm'>
+                  {times.map((time) => (
+                    <div key={time} className='border border-primary
+                    px-2 py-1 flex items-center rounded'>
+                      <span>{time}</span>
+                      <DeleteIcon onClick={()=> handleRemoveTime(date,time)}
+                        width={15} className='ml-2 text-red-500 hover:text-red-700
+                        cursor-pointer'/>
+                    </div>
+                  ))}
+
+                </div>
+                </li>
+            ))}
+          </ul>          
         </div>
       )}
+      <button className='bg-primary text-white px-8 py-2 mt-6
+      rounded hover:bg-primary/90 transition-all cursor-pointer'>
+        Add Show
+      </button>
     </>
   ):<Loading/>
 }
