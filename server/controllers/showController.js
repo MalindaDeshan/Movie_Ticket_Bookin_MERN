@@ -83,3 +83,42 @@ export const addShow = async(req,res) => {
         res.json({success: false,message: error.message})
     }
 }
+
+//API to get all shows from db
+export const getShows = async(req,res) => {
+    try {
+        const shows = await Show.find({showDateTime: {$gte: new Date()}}).populate('movie').sort({showDateTime:1});
+
+        //filter unique shows
+        const quniqueShows = new Set(shows.map(show => show.movie));
+        res.json({success:true,shows:Array.from(quniqueShows)});
+    } catch (error) {
+        console.error(error);
+        res.json({success:false,message:error.message});
+    }
+}
+
+//API to get single shows from the db
+export const getShow = async(req,res) => {
+    try {
+        const {movieId} = req.params;
+        //get all upcoming shows 
+        const shows = await Show.find({moie:movieId, showDateTime: {$gte: new Date()}});
+
+        const movie = await Movie.findById(movieId);
+        const dateTime = {};
+
+        shows.forEach((show) => {
+            const date = show.showDateTime.toISOString().split('T')[0];
+
+            if(!dateTime[date]){
+                dateTime[date] = [];
+            }
+            dateTime[date].push({time: show.showDateTime, showId: show._id});
+        })
+        res.json({success:true,movie,dateTime});
+    } catch (error) {
+        console.error(error);
+        res.json({success:false,message:error.message});
+    }
+}
