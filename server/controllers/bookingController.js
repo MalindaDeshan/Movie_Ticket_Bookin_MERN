@@ -58,6 +58,21 @@ export const createBooking = async (req,res) => {
         //Stripe payment link
         res.json({success:true,bookingId:booking._id,message:'Booking created successfully. Proceed to payment.'});
     } catch (error) {
-        
+        console.log(error.message);
+        res.json({success:false,message:error.message});
+    }
+}
+
+export const getOccupiedSeats = async (req,res) => {
+    try {
+        const {showId} = req.params;
+
+        const showData = await Show.findById(showId);
+
+        const occupiedSeats = Object.keys(showData.occupiedSeats);
+        res.json({success:true,occupiedSeats});
+    } catch (error) {
+        console.log(error.message);
+        res.json({success:false,message:error.message});
     }
 }
