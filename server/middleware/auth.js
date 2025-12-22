@@ -1,17 +1,25 @@
 import { clerkClient } from "@clerk/express";
 
 export const projectAdmin = async (req, res, next) => {
-    try {
-        const { userId } = req.auth();
+  try {
+    const auth = req.auth();
 
-        const user = await clerkClient.users.getUser(userId);
+    console.log("Auth object:", auth);
 
-        if(user.privateMetadata.role !== 'admin'){
-            return res.json({success:false,message:'not authorized'});
-        }
-
-        next();
-    } catch (error) {
-        return res.json({success:false,message:error.message});
+    if (!auth || !auth.userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-}
+
+    const user = await clerkClient.users.getUser(auth.userId);
+    console.log("User privateMetadata:", user.privateMetadata);
+
+    if (!user.privateMetadata || user.privateMetadata.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Not authorized" });
+    }
+
+    next();
+  } catch (err) {
+    console.error("Error in projectAdmin:", err.message);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
