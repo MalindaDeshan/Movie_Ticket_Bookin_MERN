@@ -2,8 +2,7 @@ import { clerkClient } from "@clerk/express";
 
 export const projectAdmin = async (req, res, next) => {
   try {
-    const auth = req.auth();
-
+    const auth = req.auth(); // From Clerk middleware
     console.log("Auth object:", auth);
 
     if (!auth || !auth.userId) {
