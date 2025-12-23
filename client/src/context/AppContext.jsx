@@ -10,7 +10,7 @@ export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isAdminLoading, setIsAdminLoading] = useState(true); // NEW: tracks if admin check is done
+  const [isAdminLoading, setIsAdminLoading] = useState(true);
   const [shows, setShows] = useState([]);
   const [favoriteMovies, setFavoriteMovies] = useState([]);
 
@@ -29,19 +29,14 @@ export const AppProvider = ({ children }) => {
     return token;
   };
 
-  /* ---------------- PUBLIC DATA: Shows ---------------- */
+  /* ---------------- PUBLIC DATA ---------------- */
   useEffect(() => {
     const fetchShows = async () => {
       try {
         const { data } = await axios.get("/api/show/all");
-        if (data.success) {
-          setShows(data.shows || []);
-        } else {
-          toast.error(data.message || "Failed to load shows");
-        }
+        if (data.success) setShows(data.shows || []);
       } catch (err) {
-        console.error("Error fetching shows:", err);
-        toast.error("Failed to load shows");
+        console.error(err);
       }
     };
     fetchShows();
@@ -50,13 +45,13 @@ export const AppProvider = ({ children }) => {
   /* ---------------- LOAD USER DATA ---------------- */
   useEffect(() => {
     if (!userLoaded || !authLoaded || !user) {
-      setIsAdminLoading(true); // reset when no user
+      setIsAdmin(false);
+      setIsAdminLoading(false);
       return;
     }
 
     const loadUserData = async () => {
-      setIsAdminLoading(true); // start loading
-
+      setIsAdminLoading(true);
       try {
         const token = await getTokenSafe();
         if (!token) {
@@ -72,35 +67,17 @@ export const AppProvider = ({ children }) => {
         const favRes = await axios.get("/api/user/favorites", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (favRes.data.success) {
-          setFavoriteMovies(favRes.data.movies || []);
-        }
+        if (favRes.data.success) setFavoriteMovies(favRes.data.movies || []);
       } catch (err) {
         console.error("Error loading user data:", err);
         setIsAdmin(false);
       } finally {
-        setIsAdminLoading(false); // always finish loading
+        setIsAdminLoading(false);
       }
     };
 
     loadUserData();
   }, [userLoaded, authLoaded, user]);
-
-  /* ---------------- ADMIN ROUTE PROTECTION (NO MORE RACE) ---------------- */
-  useEffect(() => {
-    if (!userLoaded || !authLoaded) return;
-
-    // If no user → let Clerk handle sign-in
-    if (!user && location.pathname.startsWith("/admin")) {
-      return;
-    }
-
-    // Only act AFTER admin check is complete
-    if (!isAdminLoading && user && !isAdmin && location.pathname.startsWith("/admin")) {
-      navigate("/", { replace: true });
-      toast.error("You are not authorized. Admin only.");
-    }
-  }, [userLoaded, authLoaded, user, isAdmin, isAdminLoading, location.pathname, navigate]);
 
   /* ---------------- MANUAL REFETCH ---------------- */
   const refetchFavorites = async () => {
@@ -108,15 +85,12 @@ export const AppProvider = ({ children }) => {
     try {
       const token = await getTokenSafe();
       if (!token) return;
-
       const { data } = await axios.get("/api/user/favorites", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (data.success) {
-        setFavoriteMovies(data.movies || []);
-      }
+      if (data.success) setFavoriteMovies(data.movies || []);
     } catch (err) {
-      console.error("Error refetching favorites:", err);
+      console.error(err);
     }
   };
 
@@ -124,7 +98,7 @@ export const AppProvider = ({ children }) => {
     axios,
     user,
     isAdmin,
-    isAdminLoading, // optional: expose if needed in UI
+    isAdminLoading,
     shows,
     favoriteMovies,
     refetchFavorites,
