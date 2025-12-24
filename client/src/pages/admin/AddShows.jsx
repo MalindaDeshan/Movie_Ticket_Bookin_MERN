@@ -43,7 +43,7 @@ const AddShows = () => {
       }
       return prev;
     });
-    setDateTimeInput(""); // Clear input after adding
+    setDateTimeInput("");
   };
 
   const handleRemoveTime = (date, time) => {
@@ -66,15 +66,16 @@ const AddShows = () => {
         return;
       }
 
-      const shows = Object.entries(dateTimeSelection).map(([date, times]) => ({
+      // Critical fix: match backend expected format exactly
+      const showsInput = Object.entries(dateTimeSelection).map(([date, times]) => ({
         date,
-        times
+        time: times  // ← array of time strings
       }));
 
       const payload = {
         movieId: selectedMovie,
-        shows,
-        price: Number(showPrice)
+        showsInput,     // ← key name must be showsInput
+        showPrice: Number(showPrice)
       };
 
       const { data } = await axios.post('/api/show/add', payload, {
@@ -115,7 +116,7 @@ const AddShows = () => {
             <div
               key={movie.id}
               className="relative max-w-40 cursor-pointer hover:opacity-70 hover:-translate-y-1 transition duration-300"
-              onClick={() => setSelectedMovie(movie._id)} // ← Correct arrow function – only one movie selected
+              onClick={() => setSelectedMovie(movie.id)}
             >
               <div className='relative rounded-lg overflow-hidden'>
                 <img
@@ -134,7 +135,7 @@ const AddShows = () => {
                 </div>
               </div>
 
-              {selectedMovie === movie._id && (
+              {selectedMovie === movie.id && (
                 <div className='absolute top-2 right-2 flex items-center justify-center bg-primary h-6 w-6 rounded-full'>
                   <CheckIcon className='w-4 h-4 text-white' strokeWidth={2.5} />
                 </div>
