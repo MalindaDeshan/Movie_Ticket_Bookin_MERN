@@ -61,20 +61,32 @@ const AddShows = () => {
     try {
       setAddingShow(true);
 
-      if (!selectedMovie || Object.keys(dateTimeSelection).length === 0 || !showPrice) {
-        toast.error("Please select a movie, add show times, and set price.");
+      if (!selectedMovie) {
+        toast.error("Please select a movie.");
+        setAddingShow(false);
         return;
       }
 
-      // Critical fix: match backend expected format exactly
+      if (Object.keys(dateTimeSelection).length === 0) {
+        toast.error("Please add at least one show time.");
+        setAddingShow(false);
+        return;
+      }
+
+      if (!showPrice || Number(showPrice) <= 0) {
+        toast.error("Please set a valid price.");
+        setAddingShow(false);
+        return;
+      }
+
       const showsInput = Object.entries(dateTimeSelection).map(([date, times]) => ({
         date,
-        time: times  // ← array of time strings
+        time: times
       }));
 
       const payload = {
         movieId: selectedMovie,
-        showsInput,     // ← key name must be showsInput
+        showsInput,
         showPrice: Number(showPrice)
       };
 
