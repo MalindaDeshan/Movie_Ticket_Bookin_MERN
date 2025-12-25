@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { dummyDateTimeData, dummyShowsData } from '../assets/assets'
 import BlurCircle from '../components/BlurCircle'
 import { ArrowRight, Heart, PlayCircle, PlayCircleIcon, StarIcon } from 'lucide-react'
 import timeFormat from '../lib/timeFormat'
@@ -14,7 +13,7 @@ const MovieDetails = () => {
   const {id} = useParams()
   const [show,setShows] = useState(null)
 
-  const {shows,axios,getToken,user,fetchFavoriteMovies,favoriteMovies,image_base_url} = useAppContext();
+  const {shows,axios,getToken,user,refetchFavorites,favoriteMovies,image_base_url} = useAppContext();
 
   const getShow = async () => {
     try {
@@ -39,7 +38,7 @@ const MovieDetails = () => {
       })
 
       if(data.success){
-        await fetchFavoriteMovies();
+        await refetchFavorites();
         toast.success(data.message)
       }
       } catch (error) {
